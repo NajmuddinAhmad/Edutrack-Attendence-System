@@ -1,48 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
-// Mock classes data
-let classes = [
-    {
-        id: 1,
-        classCode: 'CS101',
-        subject: 'Computer Science',
-        instructor: 'Dr. Smith',
-        schedule: 'Mon, Wed, Fri 9:00 AM',
-        duration: 60,
-        location: 'Room 101',
-        students: [],
-        totalStudents: 45,
-        attendanceRate: 89.2,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 2,
-        classCode: 'MATH201',
-        subject: 'Advanced Mathematics',
-        instructor: 'Prof. Johnson',
-        schedule: 'Tue, Thu 10:30 AM',
-        duration: 90,
-        location: 'Room 202',
-        students: [],
-        totalStudents: 38,
-        attendanceRate: 92.1,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 3,
-        classCode: 'ENG102',
-        subject: 'English Literature',
-        instructor: 'Dr. Wilson',
-        schedule: 'Mon, Wed 2:00 PM',
-        duration: 60,
-        location: 'Room 105',
-        students: [],
-        totalStudents: 42,
-        attendanceRate: 87.5,
-        createdAt: new Date().toISOString()
-    }
-];
+const db = require('../models/database');
 
 // Get all classes
 router.get('/', async (req, res) => {

@@ -4,13 +4,13 @@ const router = express.Router();
 // Get dashboard statistics
 router.get('/stats', async (req, res) => {
     try {
-        // Mock data - replace with actual database queries
+        // Mock data with Indian educational context
         const stats = {
-            totalStudents: '1,247',
-            presentToday: Math.floor(Math.random() * 100 + 1000).toString(),
-            lateArrivals: Math.floor(Math.random() * 50 + 10).toString(),
-            avgDuration: `${Math.floor(Math.random() * 20 + 45)} min`,
-            attendanceRate: (Math.random() * 10 + 85).toFixed(1)
+            totalStudents: '2,847',
+            presentToday: Math.floor(Math.random() * 200 + 2400).toString(),
+            lateArrivals: Math.floor(Math.random() * 80 + 30).toString(),
+            avgDuration: `${Math.floor(Math.random() * 30 + 75)} min`,
+            attendanceRate: (Math.random() * 8 + 84).toFixed(1)
         };
 
         res.json({
@@ -29,51 +29,78 @@ router.get('/stats', async (req, res) => {
 // Get recent activity
 router.get('/activity', async (req, res) => {
     try {
-        // Mock data - replace with actual database queries
+        // Mock data with Indian educational context
         const activities = [
             {
                 id: 1,
-                initials: 'AJ',
-                name: 'Alex Johnson',
-                class: 'CS101',
+                initials: 'AP',
+                name: 'Arjun Patel',
+                class: 'CSE301 - Database Management Systems',
                 time: 'checked in at 08:45 AM',
                 status: 'present',
                 timestamp: new Date().toISOString()
             },
             {
                 id: 2,
-                initials: 'MR',
-                name: 'Maya Rodriguez',
-                class: 'MATH201',
+                initials: 'PS',
+                name: 'Priya Sharma',
+                class: 'CSE205 - Data Structures & Algorithms',
                 time: 'checked in at 10:15 AM',
                 status: 'present',
                 timestamp: new Date().toISOString()
             },
             {
                 id: 3,
-                initials: 'ES',
-                name: 'Emma Smith',
-                class: 'ENG102',
+                initials: 'RG',
+                name: 'Rahul Gupta',
+                class: 'ECE201 - Digital Electronics',
                 time: 'checked in at 09:25 AM',
                 status: 'late',
                 timestamp: new Date().toISOString()
             },
             {
                 id: 4,
-                initials: 'DK',
-                name: 'David Kim',
-                class: 'PHY301',
+                initials: 'SS',
+                name: 'Sneha Singh',
+                class: 'MATH301 - Linear Algebra',
                 time: 'checked in at 07:50 AM',
                 status: 'early',
                 timestamp: new Date().toISOString()
             },
             {
                 id: 5,
-                initials: 'LC',
-                name: 'Lisa Chen',
-                class: 'BIO201',
+                initials: 'VK',
+                name: 'Vikas Kumar',
+                class: 'PHY101 - Classical Mechanics',
                 time: 'marked absent',
                 status: 'absent',
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: 6,
+                initials: 'AJ',
+                name: 'Anita Joshi',
+                class: 'CHEM201 - Organic Chemistry',
+                time: 'checked in at 08:30 AM',
+                status: 'present',
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: 7,
+                initials: 'DY',
+                name: 'Deepak Yadav',
+                class: 'CSE102 - Programming Fundamentals',
+                time: 'checked in at 09:45 AM',
+                status: 'late',
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: 8,
+                initials: 'KR',
+                name: 'Kavya Reddy',
+                class: 'ECE101 - Circuit Analysis',
+                time: 'checked in at 08:15 AM',
+                status: 'present',
                 timestamp: new Date().toISOString()
             }
         ];

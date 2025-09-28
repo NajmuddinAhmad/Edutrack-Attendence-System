@@ -6,10 +6,9 @@ require('dotenv').config();
 // Import routes
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
-const studentRoutes = require('./routes/students');
 const studentsApiRoutes = require('./routes/students-api');
+const teachersApiRoutes = require('./routes/teachers-api');
 const classRoutes = require('./routes/classes');
-const attendanceRoutes = require('./routes/attendance');
 const attendanceApiRoutes = require('./routes/attendance-api');
 const analyticsRoutes = require('./routes/analytics');
 
@@ -27,10 +26,9 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/students', studentRoutes);
 app.use('/api/students-real', studentsApiRoutes);
+app.use('/api/teachers', teachersApiRoutes);
 app.use('/api/classes', classRoutes);
-app.use('/api/attendance', attendanceRoutes);
 app.use('/api/attendance-real', attendanceApiRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
@@ -69,6 +67,27 @@ app.use((req, res) => {
         success: false,
         message: 'Route not found'
     });
+});
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:', error);
+    console.error('Stack:', error.stack);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+    console.log('📝 SIGTERM received, shutting down gracefully...');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('📝 SIGINT received, shutting down gracefully...');
+    process.exit(0);
 });
 
 // Start server

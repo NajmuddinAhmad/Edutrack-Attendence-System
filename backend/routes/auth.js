@@ -1,96 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const db = require('../models/database');
 const router = express.Router();
-
-// Mock users database (in production, this would be in MySQL)
-let users = [
-    {
-        id: 1,
-        username: 'admin',
-        email: 'admin@edutrack.com',
-        password: '$2b$12$Ydy1uCsI5/Wy/CEuJehO.u8o4XDBG0nRzvW1rU4OMpFZp0mj9NcOi', // password123
-        role: 'admin',
-        firstName: 'Admin',
-        lastName: 'User',
-        phone: '+1234567890',
-        isActive: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 2,
-        username: 'dr.smith',
-        email: 'dr.smith@university.edu',
-        password: '$2b$12$GM9cHt0uaAuC3dPaUIgceOTNQ6c/jjjCkhQMAlisfx7AKnAjMIeDm', // password123
-        role: 'teacher',
-        firstName: 'John',
-        lastName: 'Smith',
-        phone: '+1234567891',
-        department: 'Computer Science',
-        teacherId: 'TCH001',
-        isActive: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 3,
-        username: 'prof.johnson',
-        email: 'prof.johnson@university.edu',
-        password: '$2b$12$6Q0JNun.9KLhCePNLLZS5u0uGXz1CjXOg3ZvlE0qR91K3TOctgaYm', // password123
-        role: 'teacher',
-        firstName: 'Mary',
-        lastName: 'Johnson',
-        phone: '+1234567892',
-        department: 'Mathematics',
-        teacherId: 'TCH002',
-        isActive: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 4,
-        username: 'alex.johnson',
-        email: 'alex.johnson@student.edu',
-        password: '$2b$12$Ydy1uCsI5/Wy/CEuJehO.u8o4XDBG0nRzvW1rU4OMpFZp0mj9NcOi', // password123
-        role: 'student',
-        firstName: 'Alex',
-        lastName: 'Johnson',
-        phone: '+1234567894',
-        studentId: 'STU001',
-        department: 'Computer Science',
-        year: 3,
-        isActive: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 5,
-        username: 'maya.rodriguez',
-        email: 'maya.rodriguez@student.edu',
-        password: '$2b$12$GM9cHt0uaAuC3dPaUIgceOTNQ6c/jjjCkhQMAlisfx7AKnAjMIeDm', // password123
-        role: 'student',
-        firstName: 'Maya',
-        lastName: 'Rodriguez',
-        phone: '+1234567895',
-        studentId: 'STU002',
-        department: 'Mathematics',
-        year: 2,
-        isActive: true,
-        createdAt: new Date().toISOString()
-    },
-    {
-        id: 6,
-        username: 'emma.smith',
-        email: 'emma.smith@student.edu',
-        password: '$2b$12$6Q0JNun.9KLhCePNLLZS5u0uGXz1CjXOg3ZvlE0qR91K3TOctgaYm', // password123
-        role: 'student',
-        firstName: 'Emma',
-        lastName: 'Smith',
-        phone: '+1234567896',
-        studentId: 'STU003',
-        department: 'English Literature',
-        year: 4,
-        isActive: true,
-        createdAt: new Date().toISOString()
-    }
-];
 
 // Helper function to generate JWT token
 const generateToken = (user) => {
@@ -127,8 +39,9 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Find user by email
-        const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        // Find user by email in database
+        const users = await db.query('SELECT * FROM users WHERE email = ? AND isActive = 1', [email.toLowerCase()]);
+        const user = users[0];
         console.log('👤 User found:', user ? `${user.email} (${user.role})` : 'Not found');
         
         if (!user) {
@@ -317,6 +230,157 @@ router.post('/register', async (req, res) => {
     }
 });
 
+// POST /api/auth/admin/create-user - Admin only endpoint to create users
+router.post('/admin/create-user', authenticateToken, authorize('admin'), async (req, res) => {
+    try {
+        const {
+            username,
+            email,
+            password,
+            confirmPassword,
+            firstName,
+            lastName,
+            phone,
+            role,
+            department,
+            year,
+            studentId,
+            teacherId
+        } = req.body;
+
+        console.log('🔐 Admin creating user:', { 
+            email, 
+            role, 
+            firstName, 
+            lastName, 
+            username: finalUsername,
+            hasPassword: !!password,
+            department,
+            year 
+        });
+
+        // Auto-generate username if not provided
+        const finalUsername = username || `${firstName.toLowerCase()}.${lastName.toLowerCase()}`.replace(/\s+/g, '');
+        
+        // Validation
+        if (!email || !password || !firstName || !lastName || !role) {
+            console.log('❌ Missing required fields:', { email: !!email, password: !!password, firstName: !!firstName, lastName: !!lastName, role: !!role });
+            return res.status(400).json({
+                success: false,
+                message: 'Email, password, first name, last name, and role are required'
+            });
+        }
+
+        if (password !== confirmPassword) {
+            console.log('❌ Passwords do not match');
+            return res.status(400).json({
+                success: false,
+                message: 'Passwords do not match'
+            });
+        }
+
+        if (password.length < 6) {
+            console.log('❌ Password too short');
+            return res.status(400).json({
+                success: false,
+                message: 'Password must be at least 6 characters long'
+            });
+        }
+
+        if (!['student', 'teacher', 'admin'].includes(role)) {
+            console.log('❌ Invalid role:', role);
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid role specified'
+            });
+        }
+
+        // Check if user already exists in database
+        const existingUsers = await db.query('SELECT id FROM users WHERE email = ?', [email.toLowerCase()]);
+        
+        if (existingUsers.length > 0) {
+            console.log('❌ User already exists:', email);
+            return res.status(409).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Role-specific validation
+        if (role === 'student' && year && (year < 1 || year > 4)) {
+            console.log('❌ Invalid year:', year);
+            return res.status(400).json({
+                success: false,
+                message: 'Year must be between 1 and 4'
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.BCRYPT_ROUNDS) || 12);
+
+        // Create user in database
+        console.log('💾 Creating user in database');
+        
+        const result = await db.query(
+            'INSERT INTO users (email, password, firstName, lastName, role, isActive) VALUES (?, ?, ?, ?, ?, 1)',
+            [email.toLowerCase(), hashedPassword, firstName, lastName, role]
+        );
+
+        const newUserId = result.insertId;
+
+        // Generate IDs and create role-specific records
+        let generatedId = null;
+        if (role === 'student') {
+            const studentCount = await db.query('SELECT COUNT(*) as count FROM students');
+            generatedId = studentId || `STU${String(studentCount[0].count + 1).padStart(3, '0')}`;
+            
+            await db.query(
+                'INSERT INTO students (userId, studentId, enrollmentDate, semester, year, phone) VALUES (?, ?, NOW(), ?, ?, ?)',
+                [newUserId, generatedId, 'Fall 2024', parseInt(year) || 1, phone || '']
+            );
+        } else if (role === 'teacher') {
+            const teacherCount = await db.query('SELECT COUNT(*) as count FROM teachers');
+            generatedId = teacherId || `TCH${String(teacherCount[0].count + 1).padStart(3, '0')}`;
+            
+            await db.query(
+                'INSERT INTO teachers (userId, employeeId, department, phone) VALUES (?, ?, ?, ?)',
+                [newUserId, generatedId, department || '', phone || '']
+            );
+        }
+
+        // Get the created user from database
+        const createdUsers = await db.query('SELECT * FROM users WHERE id = ?', [newUserId]);
+        const newUser = createdUsers[0];
+
+        console.log('✅ User created successfully:', newUser.email, 'Role:', newUser.role);
+
+        res.status(201).json({
+            success: true,
+            message: 'User created successfully',
+            data: {
+                user: sanitizeUser(newUser)
+            }
+        });
+
+    } catch (error) {
+        console.error('❌ Admin user creation error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: process.env.NODE_ENV === 'development' ? error.message : {}
+        });
+    }
+});
+
+// GET /api/auth/test - Simple test endpoint
+router.get('/test', (req, res) => {
+    res.json({
+        success: true,
+        message: 'API is working',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
     // In a real application, you might want to blacklist the token
@@ -327,9 +391,10 @@ router.post('/logout', (req, res) => {
 });
 
 // GET /api/auth/me - Get current user profile
-router.get('/me', authenticateToken, (req, res) => {
+router.get('/me', authenticateToken, async (req, res) => {
     try {
-        const user = users.find(u => u.id === req.user.id);
+        const users = await db.query('SELECT * FROM users WHERE id = ? AND isActive = 1', [req.user.id]);
+        const user = users[0];
         
         if (!user) {
             return res.status(404).json({

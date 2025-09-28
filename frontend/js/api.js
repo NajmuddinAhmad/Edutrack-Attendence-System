@@ -62,11 +62,11 @@ async function fetchDashboardStats() {
         // Return mock data if API fails
         console.warn('Using mock data for dashboard stats');
         return {
-            totalStudents: '1,247',
-            presentToday: '1,089',
-            lateArrivals: '23',
-            avgDuration: '52 min',
-            attendanceRate: '87.3'
+            totalStudents: '2,847',
+            presentToday: '2,456',
+            lateArrivals: '47',
+            avgDuration: '85 min',
+            attendanceRate: '86.3'
         };
     }
 }
@@ -80,23 +80,23 @@ async function fetchRecentActivity() {
         console.warn('Using mock data for recent activity');
         return [
             {
-                initials: 'AJ',
-                name: 'Alex Johnson',
-                class: 'CS101',
+                initials: 'AP',
+                name: 'Arjun Patel',
+                class: 'CSE301 - Database Systems',
                 time: 'checked in at 08:45 AM',
                 status: 'present'
             },
             {
-                initials: 'MR',
-                name: 'Maya Rodriguez',
-                class: 'MATH201',
+                initials: 'PS',
+                name: 'Priya Sharma',
+                class: 'CSE205 - Data Structures',
                 time: 'checked in at 10:15 AM',
                 status: 'present'
             },
             {
-                initials: 'ES',
-                name: 'Emma Smith',
-                class: 'ENG102',
+                initials: 'RG',
+                name: 'Rahul Gupta',
+                class: 'ECE201 - Digital Electronics',
                 time: 'checked in at 09:25 AM',
                 status: 'late'
             },

@@ -65,6 +65,7 @@ class Modal {
 
 // Initialize modal manager
 const modalManager = new Modal();
+window.modalManager = modalManager;
 
 // Mark Attendance Modal
 function showMarkAttendanceModal() {

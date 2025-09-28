@@ -28,11 +28,14 @@ function loadStudentsPage() {
                     <div>
                         <select class="form-input" id="department-filter">
                             <option value="">All Departments</option>
-                            <option value="Computer Science">Computer Science</option>
+                            <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                            <option value="Electronics & Communication">Electronics & Communication</option>
+                            <option value="Mechanical Engineering">Mechanical Engineering</option>
+                            <option value="Civil Engineering">Civil Engineering</option>
+                            <option value="Electrical Engineering">Electrical Engineering</option>
                             <option value="Mathematics">Mathematics</option>
-                            <option value="English">English</option>
                             <option value="Physics">Physics</option>
-                            <option value="Biology">Biology</option>
+                            <option value="Chemistry">Chemistry</option>
                         </select>
                     </div>
                     <div>

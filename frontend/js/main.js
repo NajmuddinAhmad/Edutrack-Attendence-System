@@ -66,29 +66,11 @@ function initializeSidebar() {
     }
 }
 
-// Initialize navigation functionality
+// Initialize navigation functionality - delegated to role-dashboard
 function initializeNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Remove active class from all items
-            navItems.forEach(nav => {
-                nav.classList.remove('nav-active');
-                nav.classList.add('nav-inactive');
-            });
-            
-            // Add active class to clicked item
-            item.classList.remove('nav-inactive');
-            item.classList.add('nav-active');
-            
-            // Handle page switching
-            const page = item.getAttribute('data-page');
-            switchPage(page);
-        });
-    });
+    // Navigation is now handled by role-based dashboard
+    // This ensures proper role-based page loading
+    console.log('Navigation initialization delegated to role-based dashboard');
 }
 
 // Initialize quick action buttons
@@ -106,7 +88,10 @@ function initializeQuickActions() {
 // Handle page switching - now delegated to role-based dashboard
 function switchPage(page) {
     console.log('Page switching delegated to role-based dashboard:', page);
-    // Role-based dashboard handles all navigation now
+    // Delegate to role-based dashboard if available
+    if (window.roleBasedDashboard) {
+        window.roleBasedDashboard.handleNavigation(page);
+    }
 }
 
 // Handle quick actions
